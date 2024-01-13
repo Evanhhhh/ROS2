@@ -20,29 +20,42 @@ class PublisherNode : public rclcpp::Node
         PublisherNode()
         : Node("topic_helloworld_pub") // ROS2节点父类初始化
         {
-            publisher_ = this->create_publisher<std_msgs::msg::String>("chatter", 10); // 创建发布者对象（消息类型、话题名、队列长度）
+            // 创建发布者对象（消息类型、话题名、队列长度）
+            publisher_ = this->create_publisher<std_msgs::msg::String>("chatter", 10); 
+            // 创建一个定时器,定时执行回调函数
             timer_ = this->create_wall_timer(
-                500ms, std::bind(&PublisherNode::timer_callback, this));            // 创建一个定时器,定时执行回调函数
+                500ms, std::bind(&PublisherNode::timer_callback, this));            
         }
 
     private:
-        void timer_callback()                                                       // 创建定时器周期执行的回调函数
+        // 创建定时器周期执行的回调函数
+        void timer_callback()                                                       
         {
-          auto msg = std_msgs::msg::String();                                       // 创建一个String类型的消息对象
-          msg.data = "Hello World";                                                 // 填充消息对象中的消息数据
-          RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", msg.data.c_str());    // 发布话题消息
-          publisher_->publish(msg);                                                 // 输出日志信息，提示已经完成话题发布
+          // 创建一个String类型的消息对象
+          auto msg = std_msgs::msg::String();   
+          // 填充消息对象中的消息数据                                    
+          msg.data = "Hello World";
+          // 发布话题消息                                                 
+          RCLCPP_INFO(this->get_logger(), "Publishing: '%s'", msg.data.c_str()); 
+          // 输出日志信息，提示已经完成话题发布   
+          publisher_->publish(msg);                                                
         }
         
-        rclcpp::TimerBase::SharedPtr timer_;                                        // 定时器指针
-        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;             // 发布者指针
+        rclcpp::TimerBase::SharedPtr timer_;                             // 定时器指针
+        rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;  // 发布者指针
 };
 
-int main(int argc, char * argv[])                      // ROS2节点主入口main函数
+// ROS2节点主入口main函数
+int main(int argc, char * argv[])                      
 {
-    rclcpp::init(argc, argv);                          // ROS2 C++接口初始化
-    rclcpp::spin(std::make_shared<PublisherNode>());   // 创建ROS2节点对象并进行初始化
-    rclcpp::shutdown();                                // 关闭ROS2 C++接口
+    // ROS2 C++接口初始化
+    rclcpp::init(argc, argv);                
+    
+    // 创建ROS2节点对象并进行初始化          
+    rclcpp::spin(std::make_shared<PublisherNode>());   
+    
+    // 关闭ROS2 C++接口
+    rclcpp::shutdown();                                
 
     return 0;
 }
