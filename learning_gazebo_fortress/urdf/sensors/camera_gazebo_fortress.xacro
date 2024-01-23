@@ -27,9 +27,6 @@
                 </geometry>
             </collision>
         </link>
-        <gazebo reference="${prefix}_link">
-            <material>Gazebo/Black</material>
-        </gazebo>
 
         <gazebo reference="${prefix}_link">
             <sensor type="camera" name="camera_node">

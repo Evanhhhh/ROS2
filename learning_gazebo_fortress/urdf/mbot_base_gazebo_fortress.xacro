@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<robot name="mbot" xmlns:xacro="http://www.ros.org/wiki/xacro">
-
+<robot name="mbot" xmlns:xacro="http://www.ros.org/wiki/xacro">	
     <!-- PROPERTY LIST -->
     <xacro:property name="M_PI" value="3.1415926"/>
     <xacro:property name="base_mass"   value="1" /> 
@@ -31,6 +30,7 @@
     <!-- Macro for inertia matrix -->
     <xacro:macro name="sphere_inertial_matrix" params="m r">
         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <mass value="${m}" />
             <inertia ixx="${2*m*r*r/5}" ixy="0" ixz="0"
                 iyy="${2*m*r*r/5}" iyz="0" 
@@ -40,6 +40,7 @@
 
     <xacro:macro name="cylinder_inertial_matrix" params="m r h">
         <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
             <mass value="${m}" />
             <inertia ixx="${m*(3*r*r+h*h)/12}" ixy = "0" ixz = "0"
                 iyy="${m*(3*r*r+h*h)/12}" iyz = "0"
@@ -57,6 +58,13 @@
         </joint>
 
         <link name="${prefix}_wheel_link">
+            <collision>
+                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length = "${wheel_length}"/>
+                </geometry>
+            </collision>
+            
             <visual>
                 <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
                 <geometry>
@@ -64,32 +72,14 @@
                 </geometry>
                 <material name="gray" />
             </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="${M_PI/2} 0 0" />
-                <geometry>
-                    <cylinder radius="${wheel_radius}" length = "${wheel_length}"/>
-                </geometry>
-            </collision>
+
             <xacro:cylinder_inertial_matrix  m="${wheel_mass}" r="${wheel_radius}" h="${wheel_length}" />
         </link>
 
         <gazebo reference="${prefix}_wheel_link">
-            <material>Gazebo/Gray</material>
             <mu1>100000.0</mu1>
             <mu2>100000.0</mu2>
         </gazebo>
-
-        <!-- Transmission is important to link the joints and the controller -->
-        <transmission name="${prefix}_wheel_joint_trans">
-            <type>transmission_interface/SimpleTransmission</type>
-            <joint name="${prefix}_wheel_joint" >
-                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-            </joint>
-            <actuator name="${prefix}_wheel_joint_motor">
-                <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-                <mechanicalReduction>1</mechanicalReduction>
-            </actuator>
-        </transmission>
     </xacro:macro>
 
     <!-- Macro for robot caster -->
@@ -101,6 +91,13 @@
         </joint>
 
         <link name="${prefix}_caster_link">
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <sphere radius="${caster_radius}" />
+                </geometry>
+            </collision>    
+            
             <visual>
                 <origin xyz="0 0 0" rpy="0 0 0"/>
                 <geometry>
@@ -108,40 +105,27 @@
                 </geometry>
                 <material name="black" />
             </visual>
-            <collision>
-                <origin xyz="0 0 0" rpy="0 0 0"/>
-                <geometry>
-                    <sphere radius="${caster_radius}" />
-                </geometry>
-            </collision>      
+  
             <xacro:sphere_inertial_matrix  m="${caster_mass}" r="${caster_radius}" />
         </link>
-
-        <gazebo reference="${prefix}_caster_link">
-            <material>Gazebo/Black</material>
-        </gazebo>
     </xacro:macro>
 
     <xacro:macro name="mbot_base_gazebo">
-        <link name="base_footprint">
-            <visual>
-                <origin xyz="0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <box size="0.001 0.001 0.001" />
-                </geometry>
-            </visual>
-        </link>
-        <gazebo reference="base_footprint">
-            <turnGravityOff>false</turnGravityOff>
-        </gazebo>
-
+        <link name="base_footprint"/>
+      
         <joint name="base_footprint_joint" type="fixed">
-            <origin xyz="0 0 ${base_length/2 + caster_radius*2}" rpy="0 0 0" />        
             <parent link="base_footprint"/>
             <child link="base_link" />
         </joint>
 
         <link name="base_link">
+         	<collision>
+                <origin xyz=" 0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <cylinder length="${base_length}" radius="${base_radius}"/>
+                </geometry>
+            </collision>   
+            
             <visual>
                 <origin xyz=" 0 0 0" rpy="0 0 0" />
                 <geometry>
@@ -149,18 +133,9 @@
                 </geometry>
                 <material name="yellow" />
             </visual>
-            <collision>
-                <origin xyz=" 0 0 0" rpy="0 0 0" />
-                <geometry>
-                    <cylinder length="${base_length}" radius="${base_radius}"/>
-                </geometry>
-            </collision>   
+           
             <xacro:cylinder_inertial_matrix  m="${base_mass}" r="${base_radius}" h="${base_length}" />
         </link>
-
-        <gazebo reference="base_link">
-            <material>Gazebo/Blue</material>
-        </gazebo>
 
         <xacro:wheel prefix="left"  reflect="1"/>
         <xacro:wheel prefix="right" reflect="-1"/>
@@ -185,6 +160,28 @@
                   <odometry_frame>odom</odometry_frame>
                   <robot_base_frame>base_footprint</robot_base_frame>
             </plugin>
+            <plugin
+				filename="ignition-gazebo-sensors-system"
+				name="ignition::gazebo::systems::Sensors">
+				<render_engine>ogre</render_engine>
+			</plugin>
+			<plugin
+				filename="ignition-gazebo-user-commands-system"
+				name="ignition::gazebo::systems::UserCommands">
+			</plugin>
+			<plugin
+				filename="ignition-gazebo-scene-broadcaster-system"
+				name="ignition::gazebo::systems::SceneBroadcaster">
+			</plugin>
+			<plugin 
+				filename="ignition-gazebo-joint-state-publisher-system" 
+				name="ignition::gazebo::systems::JointStatePublisher"/>
+			<plugin
+				filename="ignition-gazebo-odometry-publisher-system"
+				name="ignition::gazebo::systems::OdometryPublisher">
+				<odom_frame>odom</odom_frame>
+				<robot_base_frame>base_footprint</robot_base_frame>
+			</plugin>
         </gazebo> 
     </xacro:macro>
 
