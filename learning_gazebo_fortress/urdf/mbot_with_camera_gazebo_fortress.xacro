@@ -22,9 +22,23 @@
 		  filename="ignition-gazebo-scene-broadcaster-system"
 		  name="gz::sim::systems::SceneBroadcaster">
 		</plugin>
-	</gazebo>	
-		
+	</gazebo>
+	
     <xacro:include filename="$(find learning_gazebo_fortress)/urdf/mbot_base_gazebo_fortress.xacro" />
+    <xacro:include filename="$(find learning_gazebo_fortress)/urdf/sensors/camera_gazebo_fortress.xacro" />
+
+    <xacro:property name="camera_offset_x" value="0.17" />
+    <xacro:property name="camera_offset_y" value="0" />
+    <xacro:property name="camera_offset_z" value="0.10" />
+
+    <!-- Camera -->
+    <joint name="camera_joint" type="fixed">
+        <origin xyz="${camera_offset_x} ${camera_offset_y} ${camera_offset_z}" rpy="0 0 0" />
+        <parent link="base_link"/>
+        <child link="camera_link"/>
+    </joint>
+
+    <xacro:usb_camera prefix="camera"/>
 
     <xacro:mbot_base_gazebo/>
 

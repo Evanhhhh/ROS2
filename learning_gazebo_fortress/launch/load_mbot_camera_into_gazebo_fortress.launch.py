@@ -8,6 +8,7 @@ from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
+from launch.conditions import LaunchConfigurationEquals
 
 
 def generate_launch_description():
@@ -30,7 +31,7 @@ def generate_launch_description():
   
     mbot = IncludeLaunchDescription(
                 PythonLaunchDescriptionSource([os.path.join(
-                    get_package_share_directory(package_name),'launch','mbot_gazebo_fortress.launch.py'
+                    get_package_share_directory(package_name),'launch','mbot_camera.launch.py'
                 )]), launch_arguments={'use_sim_time': 'true', 'world':world_path}.items()
     )
 
@@ -52,14 +53,24 @@ def generate_launch_description():
                                    '-Y', spawn_yaw_val],
                         output='screen')
 
-
     # cmd_vel bridge
     cmd_vel_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        name='cmd_vel_bridge',
         arguments=[
             '/cmd_vel@geometry_msgs/msg/Twist@ignition.msgs.Twist'
         ],
+        output='screen'
+    )
+    
+    # camera bridge    
+    camera_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='camera_bridge',
+        arguments=['/camera@sensor_msgs/msg/Image@gz.msgs.Image',
+                   '/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo'],
         output='screen'
     )
 
@@ -69,4 +80,5 @@ def generate_launch_description():
         gazebo,
         spawn_entity,
         cmd_vel_bridge,
+        camera_bridge,
     ])
