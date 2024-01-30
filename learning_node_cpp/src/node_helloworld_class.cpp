@@ -3,6 +3,7 @@
 @说明: ROS2节点示例-发布“Hello World”日志信息, 使用面向对象的实现方式
 ***/
 
+#include <unistd.h>
 #include "rclcpp/rclcpp.hpp"
 
 

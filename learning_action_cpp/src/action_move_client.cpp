@@ -64,17 +64,17 @@ class MoveCircleActionClient : public rclcpp::Node
 
         // 创建一个服务器收到目标之后反馈时的回调函数
         void goal_response_callback(GoalHandle::SharedPtr goal_message)
-        {
-            if (!goal_message)
-            {
-                RCLCPP_ERROR(this->get_logger(), "Client: Goal was rejected by server");
-                rclcpp::shutdown(); // Shut down client node
-            }
-            else
-            {
-                RCLCPP_INFO(this->get_logger(), "Client: Goal accepted by server, waiting for result");
-            }
-        }
+		{
+			if (!goal_message)
+			{
+				RCLCPP_ERROR(this->get_logger(), "Client: Goal was rejected by server");
+				rclcpp::shutdown(); // Shut down client node
+			}
+			else
+			{
+				RCLCPP_INFO(this->get_logger(), "Client: Goal accepted by server, waiting for result");
+			}
+		}
 
         // 创建处理周期反馈消息的回调函数
         void feedback_callback(

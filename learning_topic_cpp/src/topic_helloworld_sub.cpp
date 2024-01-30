@@ -20,9 +20,9 @@ class SubscriberNode : public rclcpp::Node
         }
 
     private:
-        void topic_callback(const std_msgs::msg::String & msg) const                  // 创建回调函数，执行收到话题消息后对数据的处理
+        void topic_callback(const std_msgs::msg::String::SharedPtr msg) const                  // 创建回调函数，执行收到话题消息后对数据的处理
         {
-            RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg.data.c_str());       // 输出日志信息，提示订阅收到的话题消息
+            RCLCPP_INFO(this->get_logger(), "I heard: '%s'", msg->data.c_str());       // 输出日志信息，提示订阅收到的话题消息
         }
         
         rclcpp::Subscription<std_msgs::msg::String>::SharedPtr subscription_;         // 订阅者指针
