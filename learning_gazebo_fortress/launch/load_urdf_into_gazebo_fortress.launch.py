@@ -18,6 +18,7 @@ def generate_launch_description():
     package_name='learning_gazebo_fortress' #<--- CHANGE ME
     pkg_path = os.path.join(get_package_share_directory(package_name))
     xacro_file = os.path.join(pkg_path,'urdf','mbot_gazebo_fortress.xacro')
+    world_file = os.path.join(pkg_path,'worlds','empty.sdf')
     robot_description_config = xacro.process_file(xacro_file)
     
     # Pose where we want to spawn the robot
@@ -31,7 +32,7 @@ def generate_launch_description():
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': '-r empty.sdf'}.items(),
+        launch_arguments={'gz_args': '-r ' + world_file}.items(),
     )
 
     # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
