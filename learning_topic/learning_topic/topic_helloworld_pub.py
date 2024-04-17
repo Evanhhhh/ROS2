@@ -17,7 +17,7 @@ class PublisherNode(Node):
     
     def __init__(self, name):
         super().__init__(name)                                    # ROS2节点父类初始化
-        self.pub = self.create_publisher(String, "chatter", 10)   # 创建发布者对象（消息类型、话题名、队列长度）
+        self.pub = self.create_publisher(String, "chatter", 10)   # 创建发布者对象（消息类型、话题名、队列长度） create_publisher()
         self.timer = self.create_timer(0.5, self.timer_callback)  # 创建一个定时器（单位为秒的周期，定时执行的回调函数）
         
     def timer_callback(self):                                     # 创建定时器周期执行的回调函数
